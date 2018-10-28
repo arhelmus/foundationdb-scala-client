@@ -10,7 +10,7 @@ import me.archdev.foundationdb.serializers._
 
 package object transactions {
 
-  implicit val QueryAlgebraInterpreter: QueryAlgebra[TransactionPlan] =
+  implicit val QueryAlgebraInterpreter: TransactionAlgebra =
     new QueryAlgebra[TransactionPlan] {
       override def set[K, V](key: K, value: V)(implicit ks: Tupler[K],
                                                vs: Tupler[V],

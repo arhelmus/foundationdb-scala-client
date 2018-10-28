@@ -10,6 +10,6 @@ package object foundationdb {
   type TransactionPlan[A] = StateT[IO, Transaction, A]
   type TransactionAlgebra = QueryAlgebra[TransactionPlan]
 
-  val syntax = transactions.QueryAlgebraInterpreter
+  val syntax: TransactionAlgebra = transactions.QueryAlgebraInterpreter
 
 }
