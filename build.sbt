@@ -4,11 +4,18 @@ version := "0.1"
 
 scalaVersion := "2.12.7"
 
-libraryDependencies += "org.foundationdb" % "fdb-java" % "5.2.5"
-libraryDependencies += "org.typelevel" %% "cats-core" % "1.4.0"
-libraryDependencies += "org.typelevel" %% "cats-effect" % "1.0.0"
-libraryDependencies += "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0"
-libraryDependencies += "com.chuusai" %% "shapeless" % "2.3.3"
+libraryDependencies ++= Seq(
+  "org.foundationdb" % "fdb-java" % "5.2.5",
+  "org.typelevel" %% "cats-core" % "1.4.0",
+  "org.typelevel" %% "cats-effect" % "1.0.0",
+  "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0",
+  "com.chuusai" %% "shapeless" % "2.3.3"
+)
+
+libraryDependencies ++= Seq(
+  "org.scalatest" %% "scalatest" % "3.0.5" % "test",
+  "com.dimafeng" %% "testcontainers-scala" % "0.21.0" % "test"
+)
 
 scalacOptions += "-Ypartial-unification"
 addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.2.4")

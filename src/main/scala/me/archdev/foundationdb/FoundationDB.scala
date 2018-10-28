@@ -15,7 +15,11 @@ class FoundationDB(db: Database) {
 object FoundationDB {
 
   def apply(version: Int) = {
-    val fdb = FDB.selectAPIVersion(520)
+    val fdb = if (FDB.isAPIVersionSelected) {
+      FDB.instance()
+    } else {
+      FDB.selectAPIVersion(version)
+    }
     new FoundationDB(fdb.open())
   }
 
