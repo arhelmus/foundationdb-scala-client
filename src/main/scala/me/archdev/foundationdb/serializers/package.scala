@@ -10,16 +10,58 @@ package object serializers {
     def read(tuple: Tuple, idx: Int): A
   }
 
+  implicit val BooleanToTuple: Tupler[Boolean] =
+    new Tupler[Boolean] {
+      override def write(tuple: Tuple, value: Boolean): Tuple = tuple.add(value)
+      override def read(tuple: Tuple, idx: Int): Boolean      = tuple.getBoolean(idx)
+    }
+
+  implicit val CharToTuple: Tupler[Char] =
+    new Tupler[Char] {
+      override def write(tuple: Tuple, value: Char): Tuple = tuple.add(value)
+      override def read(tuple: Tuple, idx: Int): Char      = tuple.getLong(idx).toChar
+    }
+
   implicit val StringToTuple: Tupler[String] =
     new Tupler[String] {
       override def write(tuple: Tuple, value: String): Tuple = tuple.add(value)
       override def read(tuple: Tuple, idx: Int): String      = tuple.getString(idx)
     }
 
+  implicit val ByteToTuple: Tupler[Byte] =
+    new Tupler[Byte] {
+      override def write(tuple: Tuple, value: Byte): Tuple = tuple.add(value)
+      override def read(tuple: Tuple, idx: Int): Byte      = tuple.getLong(idx).toByte
+    }
+
+  implicit val ShortToTuple: Tupler[Short] =
+    new Tupler[Short] {
+      override def write(tuple: Tuple, value: Short): Tuple = tuple.add(value)
+      override def read(tuple: Tuple, idx: Int): Short      = tuple.getLong(idx).toShort
+    }
+
   implicit val IntToTuple: Tupler[Int] =
     new Tupler[Int] {
       override def write(tuple: Tuple, value: Int): Tuple = tuple.add(value)
       override def read(tuple: Tuple, idx: Int): Int      = tuple.getLong(idx).toInt
+    }
+
+  implicit val LongToTuple: Tupler[Long] =
+    new Tupler[Long] {
+      override def write(tuple: Tuple, value: Long): Tuple = tuple.add(value)
+      override def read(tuple: Tuple, idx: Int): Long      = tuple.getLong(idx)
+    }
+
+  implicit val FloatToTuple: Tupler[Float] =
+    new Tupler[Float] {
+      override def write(tuple: Tuple, value: Float): Tuple = tuple.add(value)
+      override def read(tuple: Tuple, idx: Int): Float      = tuple.getFloat(idx)
+    }
+
+  implicit val DoubleToTuple: Tupler[Double] =
+    new Tupler[Double] {
+      override def write(tuple: Tuple, value: Double): Tuple = tuple.add(value)
+      override def read(tuple: Tuple, idx: Int): Double      = tuple.getDouble(idx)
     }
 
   implicit val hnilToTuple: Tupler[HNil] =
