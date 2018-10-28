@@ -3,12 +3,15 @@ package me.archdev.foundationdb
 import cats.effect.IO
 import com.apple.foundationdb.{ Database, FDB }
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ ExecutionContext, Future }
 
 class FoundationDB(db: Database) {
 
-  def exec[A](f: Query[A])(implicit ec: ExecutionContext, ql: TransactionAlgebra): IO[A] =
-    execution.IOTransactionExecutor.exec(db, f(ql))
+  def prepare[A](transactionPlan: TransactionPlan[A])(implicit ec: ExecutionContext): IO[A] =
+    execution.IOTransactionExecutor.exec(db, transactionPlan)
+
+  def execute[A](transactionPlan: TransactionPlan[A])(implicit ec: ExecutionContext): Future[A] =
+    prepare(transactionPlan).unsafeToFuture()
 
 }
 

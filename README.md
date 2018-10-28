@@ -18,16 +18,20 @@ Work in progress:
 ## Example
 Current example is a design concept, if you have ideas how to make it better, feel free to open an Issue or PR.
 ```scala
+
+  import me.archdev.foundationdb._
+  import me.archdev.foundationdb.syntax._
+
   val fdb = FoundationDB(520)
 
   implicit val subspace: Subspace = Subspace("test_subspace")
   
-  fdb.exec(db =>
+  fdb.execute(
       for {
-        _ <- db.set("key", SomeStorageModel("1", 2, "3"))
-        _ <- db.set("key2", "value2")
-        result <- db.get[String, SomeStorageModel]("key")
-        _ <- db.delete("key2")
+        _ <- set("key", SomeStorageModel("1", 2, "3"))
+        _ <- set("key2", "value2")
+        result <- get[String, SomeStorageModel]("key")
+        _ <- delete("key2")
       } yield result
   )
 ```

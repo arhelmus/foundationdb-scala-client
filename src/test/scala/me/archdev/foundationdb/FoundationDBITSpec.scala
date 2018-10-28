@@ -1,7 +1,7 @@
 package me.archdev.foundationdb
 
+import me.archdev.foundationdb.syntax._
 import me.archdev.foundationdb.utils.ITTestSpec
-import me.archdev.foundationdb.transactions._
 
 class FoundationDBITSpec extends ITTestSpec {
 
@@ -10,17 +10,16 @@ class FoundationDBITSpec extends ITTestSpec {
     "support base transaction API" in {
       val db = FoundationDB(520)
 
-      val transaction = db.exec(
-        q =>
-          for {
-            _               <- q.set("sence-of-life", 42)
-            _               <- q.set("Arthur", "Kushka")
-            _               <- q.set("language", "PHP")
-            _               <- q.delete("language")
-            senceOfLife     <- q.get[String, Int]("sence-of-life")
-            arthursLastName <- q.get[String, String]("Arthur")
-            language        <- q.get[String, String]("language")
-          } yield (senceOfLife, arthursLastName, language)
+      val transaction = db.prepare(
+        for {
+          _               <- set("sence-of-life", 42)
+          _               <- set("Arthur", "Kushka")
+          _               <- set("language", "PHP")
+          _               <- delete("language")
+          senceOfLife     <- get[String, Int]("sence-of-life")
+          arthursLastName <- get[String, String]("Arthur")
+          language        <- get[String, String]("language")
+        } yield (senceOfLife, arthursLastName, language)
       )
 
       transaction.unsafeRunSync() shouldBe (Some(42), Some("Kushka"), None)
@@ -30,23 +29,21 @@ class FoundationDBITSpec extends ITTestSpec {
       val db                          = FoundationDB(520)
       implicit var subspace: Subspace = Subspace("my-pretty-subspace")
 
-      val transaction = db.exec(
-        q =>
-          for {
-            _           <- q.set("sence-of-life", 42)
-            senceOfLife <- q.get[String, Int]("sence-of-life")
-          } yield senceOfLife
+      val transaction = db.prepare(
+        for {
+          _           <- set("sence-of-life", 42)
+          senceOfLife <- get[String, Int]("sence-of-life")
+        } yield senceOfLife
       )
 
       transaction.unsafeRunSync() shouldBe Some(42)
 
       subspace = Subspace("another-subspace")
 
-      val anotherTransaction = db.exec(
-        q =>
-          for {
-            senceOfLife <- q.get[String, Int]("sence-of-life")
-          } yield senceOfLife
+      val anotherTransaction = db.prepare(
+        for {
+          senceOfLife <- get[String, Int]("sence-of-life")
+        } yield senceOfLife
       )
 
       anotherTransaction.unsafeRunSync() shouldBe None
@@ -57,12 +54,11 @@ class FoundationDBITSpec extends ITTestSpec {
 
       case class DataStorageClass(a: String, b: Int)
 
-      val transaction = db.exec(
-        q =>
-          for {
-            _                <- q.set("derivation-test", DataStorageClass("test", 42))
-            dataStorageClass <- q.get[String, DataStorageClass]("derivation-test")
-          } yield dataStorageClass
+      val transaction = db.prepare(
+        for {
+          _                <- set("derivation-test", DataStorageClass("test", 42))
+          dataStorageClass <- get[String, DataStorageClass]("derivation-test")
+        } yield dataStorageClass
       )
 
       transaction.unsafeRunSync() shouldBe Some(DataStorageClass("test", 42))
