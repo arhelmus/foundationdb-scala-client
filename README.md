@@ -9,9 +9,9 @@ Work in progress:
 - [x] Transaction DSL concept
 - [x] Generic serialization
 - [x] Namespaces control
+- [x] Optimization of async effects
 - [ ] Integration and Unit tests
 - [ ] Directory management
-- [ ] Optimization of async effects
 - [ ] Full support of transaction DSL 
 - [ ] Public CI setup and release
 
