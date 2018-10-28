@@ -1,16 +1,16 @@
-package me.archdev.foundationdb
+package me.archdev.foundationdb.algebra
 
 import cats.data.StateT
 import cats.effect.IO
 import com.apple.foundationdb.Transaction
 import com.apple.foundationdb.tuple.Tuple
-import me.archdev.foundationdb.algebra.QueryAlgebra
-import me.archdev.foundationdb.Utils._
+import me.archdev.foundationdb.{ Subspace, TransactionAlgebra, TransactionPlan }
 import me.archdev.foundationdb.serializers._
+import me.archdev.foundationdb.Utils._
 
-package object transactions {
+object IOInterpreter {
 
-  implicit val QueryAlgebraInterpreter: TransactionAlgebra =
+  val Interpreter: TransactionAlgebra =
     new QueryAlgebra[TransactionPlan] {
       override def set[K, V](key: K, value: V)(implicit ks: Tupler[K],
                                                vs: Tupler[V],
