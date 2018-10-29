@@ -1,5 +1,6 @@
 FoundationDB Scala client
 =========================
+[![Build Status](https://travis-ci.com/ArchDev/foundationdb-scala-client.svg?branch=master)](https://travis-ci.com/ArchDev/foundationdb-scala-client)
 
 This is a functional Scala wrapper for Java FoundationDB driver.
 Goal of it is to provide easy to use access to FoundationDB from Scala.
