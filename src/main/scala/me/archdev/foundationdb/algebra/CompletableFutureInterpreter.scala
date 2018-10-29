@@ -10,20 +10,17 @@ import me.archdev.foundationdb.serializers._
 
 object CompletableFutureInterpreter extends QueryAlgebra[TransactionPlan] {
 
-  override def set[K, V](key: K,
-                         value: V)(implicit ks: Tupler[K], vs: Tupler[V], subspace: Subspace): TransactionPlan[Unit] =
+  override def set[K: Tupler, V: Tupler](key: K, value: V)(implicit subspace: Subspace): TransactionPlan[Unit] =
     StateT { tr =>
       inCompletedFuture(tr, _.set(subspace.raw.pack(key.toTuple), value.toTuple.pack()))
     }
 
-  override def get[K, V](
-      key: K
-  )(implicit ks: Tupler[K], vs: Tupler[V], subspace: Subspace): TransactionPlan[Option[V]] =
+  override def get[K: Tupler, V: Tupler](key: K)(implicit subspace: Subspace): TransactionPlan[Option[V]] =
     StateT { tr =>
       tr.get(subspace.raw.pack(key.toTuple)).thenApply(output => tr -> parseFDBOutput[V](output))
     }
 
-  override def delete[K](key: K)(implicit ks: Tupler[K], subspace: Subspace): TransactionPlan[Unit] =
+  override def delete[K: Tupler](key: K)(implicit subspace: Subspace): TransactionPlan[Unit] =
     StateT(tr => inCompletedFuture(tr, _.clear(subspace.raw.pack(key.toTuple))))
 
   override def raw[V](f: Transaction => V): TransactionPlan[V] =

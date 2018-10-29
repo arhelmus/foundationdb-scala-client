@@ -6,9 +6,9 @@ import me.archdev.foundationdb.serializers.Tupler
 package object algebra {
 
   trait QueryAlgebra[F[_]] {
-    def set[K, V](key: K, value: V)(implicit ks: Tupler[K], vs: Tupler[V], subspace: Subspace = Subspace()): F[Unit]
-    def get[K, V](key: K)(implicit ks: Tupler[K], vs: Tupler[V], subspace: Subspace = Subspace()): F[Option[V]]
-    def delete[K](key: K)(implicit ks: Tupler[K], subspace: Subspace = Subspace()): F[Unit]
+    def set[K: Tupler, V: Tupler](key: K, value: V)(implicit subspace: Subspace = Subspace()): F[Unit]
+    def get[K: Tupler, V: Tupler](key: K)(implicit subspace: Subspace = Subspace()): F[Option[V]]
+    def delete[K: Tupler](key: K)(implicit subspace: Subspace = Subspace()): F[Unit]
     def raw[V](f: Transaction => V): F[V]
   }
 
