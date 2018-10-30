@@ -20,7 +20,7 @@ before_cache:
 - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
 - find $HOME/.sbt -name "*.lock" -delete
 after_success:
-- sbt publish
+- sbt +publish
 env:
   global:
   - secure: DmDePYhZKPdEdbP5XDwNrKc7Me65RnYun3A7pd9F7ueNxojKQpxLmUoB0MfjVCiRo+EuBB+nWXtaCI6PP0qR79twbhUj9c/izhy+qrkTpM4DxW7lfukt3YAjVDvVA2xg6MouhVkaRBTyxjqEO3Rpo8cgkji+U3TrQd3M4QRBYFJWcgzlD/IgKHwRvofrdjW7Olc8CFJC1fZR/+zqgDTpgyp1ZZYFMxgP9p9jmxEQOfG5B5D2dSO2O8mj/m6MvmGuIj/L4kJq0Bo6l5iLOtsDh8s5ZXxpD91Yb4FTTV2Be9gJes4u2K+VSvlmBCbX78kwpjRgArR9CkWNqqQBhF0dgYB9MPXImdKttjEX/QuBEa4dJI8X8TNBptEJT10s5JiGqUaKIh2zAkptSWjw3T2pG/82a2etgC/OEC0AOBTvhvgolAoy896p5fBtaQX07vkDN0YlfcRzcUOQbp+4l9KOTBKPIGe54aQlfrFoY6XvVhE4TDYKdUaKrkqfcuYEdoFzEU9ua+bNoklHXboi4XZeeaZj5pgeSPZX8txFyeVQ8HfEy44Y2T43uu48udRlLaYXBSV4t0yZqPegBywKMO8LgrBKPbC9IzYF/DxW/Euqyk8ldV1SHOaB6ljN3Fzw1n0xiEyAHxyi7pR0lmMaNlvp9ScazERe5iMDAH0Wb2LlKoM=

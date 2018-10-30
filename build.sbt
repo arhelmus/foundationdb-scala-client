@@ -6,6 +6,8 @@ organization := "me.archdev"
 
 scalaVersion := "2.12.7"
 
+crossScalaVersions := Seq("2.12.7", "2.11.12")
+
 libraryDependencies ++= Seq(
   "org.foundationdb" % "fdb-java" % "5.2.5",
   "org.typelevel" %% "cats-core" % "1.4.0",
