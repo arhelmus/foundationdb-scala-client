@@ -1,29 +1,27 @@
 sudo: true
 services:
-  - docker
-
+- docker
 language: scala
-
 scala:
-  - 2.12.7
-
+- 2.12.7
 install:
-  - wget https://www.foundationdb.org/downloads/5.2.5/ubuntu/installers/foundationdb-clients_5.2.5-1_amd64.deb
-  - wget https://www.foundationdb.org/downloads/5.2.5/ubuntu/installers/foundationdb-server_5.2.5-1_amd64.deb
-  - sudo dpkg -i foundationdb-clients_5.2.5-1_amd64.deb foundationdb-server_5.2.5-1_amd64.deb
-
+- wget https://www.foundationdb.org/downloads/5.2.5/ubuntu/installers/foundationdb-clients_5.2.5-1_amd64.deb
+- wget https://www.foundationdb.org/downloads/5.2.5/ubuntu/installers/foundationdb-server_5.2.5-1_amd64.deb
+- sudo dpkg -i foundationdb-clients_5.2.5-1_amd64.deb foundationdb-server_5.2.5-1_amd64.deb
 jdk:
-  - openjdk8
-
+- openjdk8
 script:
-  - sbt test
-
+- sbt test
 cache:
   directories:
-    - $HOME/.ivy2/cache
-    - $HOME/.sbt/boot/
-
+  - "$HOME/.ivy2/cache"
+  - "$HOME/.sbt/boot/"
 before_cache:
-  # Tricks to avoid unnecessary cache updates
-  - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
-  - find $HOME/.sbt -name "*.lock" -delete
+- find $HOME/.ivy2 -name "ivydata-*.properties" -delete
+- find $HOME/.sbt -name "*.lock" -delete
+after_success:
+- sbt publish
+env:
+  global:
+  - secure: DmDePYhZKPdEdbP5XDwNrKc7Me65RnYun3A7pd9F7ueNxojKQpxLmUoB0MfjVCiRo+EuBB+nWXtaCI6PP0qR79twbhUj9c/izhy+qrkTpM4DxW7lfukt3YAjVDvVA2xg6MouhVkaRBTyxjqEO3Rpo8cgkji+U3TrQd3M4QRBYFJWcgzlD/IgKHwRvofrdjW7Olc8CFJC1fZR/+zqgDTpgyp1ZZYFMxgP9p9jmxEQOfG5B5D2dSO2O8mj/m6MvmGuIj/L4kJq0Bo6l5iLOtsDh8s5ZXxpD91Yb4FTTV2Be9gJes4u2K+VSvlmBCbX78kwpjRgArR9CkWNqqQBhF0dgYB9MPXImdKttjEX/QuBEa4dJI8X8TNBptEJT10s5JiGqUaKIh2zAkptSWjw3T2pG/82a2etgC/OEC0AOBTvhvgolAoy896p5fBtaQX07vkDN0YlfcRzcUOQbp+4l9KOTBKPIGe54aQlfrFoY6XvVhE4TDYKdUaKrkqfcuYEdoFzEU9ua+bNoklHXboi4XZeeaZj5pgeSPZX8txFyeVQ8HfEy44Y2T43uu48udRlLaYXBSV4t0yZqPegBywKMO8LgrBKPbC9IzYF/DxW/Euqyk8ldV1SHOaB6ljN3Fzw1n0xiEyAHxyi7pR0lmMaNlvp9ScazERe5iMDAH0Wb2LlKoM=
+  - secure: qtwb4HhN2MB/uFb++EpFwXjq5QyHGVXhu7/gngHYGJOO1Q02zy8641fKZsXpBibVT9IX8wQK15Nih9NnrdHPdvo3GdBimcqr10Oi933gfsZNbQ7aECl/aMJ+AeDWKLO7XoUUHghsLL7OKgYbEoJJcj5Mct4vTto65reqPFR8jNisC3fDr/6uMCz5IbcXE2QODQ+T2uO9z/3+03GSoGxZ+uX8RksDRiBFOMmWg3oYJRMyYVyqmEitDFC3qmedc3RH+VG9HS/KRvYCOipLDP0qGtF12ljopgf/HvT5foyOspNOpwtOKVfK4WlOnnhwuG1R5DKQbPG5B8AaDSlpz9ppKP2jAO/hAqwzZnR4skFeH28NtnKBTeiBYZIDy5bmuO8le4qNcHsakHM0BRaU1nP7Io+1Yv6i/UHmKuMpk/NDwUPHplhxmbTS9e5rzRur99qR6hqOLhsrRYjjKygxXtP7Vqvk2h2iXGMEQ5AcclSPlBESo9f4chvbo2V0bd8/tBOieJFU45hkesIFDszDEbKWr8jJPYvxAyHGMPE06BJ0qZ3Wg091gKQz0yvc//7QrHcgVrvOfInaZc8A+4twTpGmIAZ0F8GDQH3vengmAqrVDDCyB0LzkcLTP3rs3hm3qzpXqowXWB3gGHE4e2gqbJ3LEGgkeaDbWlkwuY1Sf2lLVqk=
