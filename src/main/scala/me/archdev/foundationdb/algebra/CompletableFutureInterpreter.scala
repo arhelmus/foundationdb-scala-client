@@ -1,6 +1,7 @@
 package me.archdev.foundationdb.algebra
 
 import java.util.concurrent.CompletableFuture
+import java.util.function
 
 import cats.data.StateT
 import com.apple.foundationdb.Transaction
@@ -18,7 +19,9 @@ object CompletableFutureInterpreter extends QueryAlgebra[TransactionPlan] {
 
   override def get[K: Tupler, V: Tupler](key: K)(implicit subspace: Subspace): TransactionPlan[Option[V]] =
     transactionAction {
-      _.get(subspace.raw.pack(key.toTuple)).thenApply(output => parseFDBOutput[V](output))
+      _.get(subspace.raw.pack(key.toTuple)).thenApply(new function.Function[Array[Byte], Option[V]] {
+        override def apply(t: Array[Byte]): Option[V] = parseFDBOutput[V](t)
+      })
     }
 
   override def delete[K: Tupler](key: K)(implicit subspace: Subspace): TransactionPlan[Unit] =
@@ -38,8 +41,11 @@ object CompletableFutureInterpreter extends QueryAlgebra[TransactionPlan] {
   private def transactionAction[A](f: Transaction => CompletableFuture[A]): TransactionPlan[A] =
     StateT { tr =>
       Option(f(tr)) match {
-        case Some(result) => result.thenApply(result => tr -> result)
-        case None         => CompletableFuture.completedFuture(tr -> null.asInstanceOf[A])
+        case None => CompletableFuture.completedFuture(tr -> null.asInstanceOf[A])
+        case Some(result) =>
+          result.thenApply(new function.Function[A, (Transaction, A)] {
+            override def apply(result: A): (Transaction, A) = tr -> result
+          })
       }
     }
 

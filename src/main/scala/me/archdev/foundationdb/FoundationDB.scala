@@ -1,6 +1,6 @@
 package me.archdev.foundationdb
 
-import java.util.Collections
+import java.util.{ function, Collections }
 import java.util.concurrent.{ AbstractExecutorService, CompletableFuture, TimeUnit }
 
 import cats.effect.IO
@@ -18,10 +18,22 @@ class FoundationDB(db: Database) {
     prepare(tr).unsafeToFuture()
 
   private def exec[A](db: Database, plan: TransactionPlan[A])(implicit ec: ExecutionContext): IO[Future[A]] =
-    IO(db.runAsync(transformTransactionPlan(_, plan), ExecutionContextExecutorServiceBridge(ec)).toScala)
+    IO(
+      db.runAsync(
+          new function.Function[Transaction, CompletableFuture[A]] {
+            override def apply(t: Transaction): CompletableFuture[A] = transformTransactionPlan(t, plan)
+          },
+          ExecutionContextExecutorServiceBridge(ec)
+        )
+        .toScala
+    )
 
   private def transformTransactionPlan[A](tr: Transaction, plan: TransactionPlan[A]): CompletableFuture[A] =
-    plan.run(tr).thenApply(_._2)
+    plan
+      .run(tr)
+      .thenApply(new function.Function[(Transaction, A), A] {
+        override def apply(t: (Transaction, A)): A = t._2
+      })
 
 }
 
