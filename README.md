@@ -11,10 +11,10 @@ Work in progress:
 - [x] Generic serialization
 - [x] Namespaces control
 - [x] Optimization of async effects
+- [x] Public CI setup and release
 - [ ] Integration and Unit tests
 - [ ] Directory management
 - [ ] Full support of transaction DSL 
-- [ ] Public CI setup and release
 
 ## Example
 Current example is a design concept, if you have ideas how to make it better, feel free to open an Issue or PR.
@@ -35,6 +35,16 @@ Current example is a design concept, if you have ideas how to make it better, fe
         _ <- delete("key2")
       } yield result
   )
+```
+
+There is no release yet, but you can use snapshot to try it:
+```
+libraryDependencies += "me.archdev" %% "foundation-db-scala" % "0.0.1-SNAPSHOT"
+
+resolvers ++= Seq(
+  Resolver.sonatypeRepo("releases"),
+  Resolver.sonatypeRepo("snapshots")
+)
 ```
 
 ## Copyright
