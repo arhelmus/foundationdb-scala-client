@@ -1,7 +1,7 @@
 package me.archdev.foundationdb
 
-import java.util.{ function, Collections }
 import java.util.concurrent.{ AbstractExecutorService, CompletableFuture, TimeUnit }
+import java.util.{ function, Collections }
 
 import cats.effect.IO
 import com.apple.foundationdb.{ Database, FDB, Transaction }
@@ -9,7 +9,7 @@ import com.apple.foundationdb.{ Database, FDB, Transaction }
 import scala.compat.java8.FutureConverters._
 import scala.concurrent.{ ExecutionContext, ExecutionContextExecutorService, Future }
 
-class FoundationDB(db: Database) {
+class FoundationDB(val db: Database) {
 
   def prepare[A](tr: TransactionPlan[A])(implicit ec: ExecutionContext): IO[A] =
     IO.fromFuture(exec(db, tr))

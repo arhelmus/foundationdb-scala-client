@@ -49,6 +49,31 @@ class FoundationDBITSpec extends ITTestSpec {
       anotherTransaction.unsafeRunSync() shouldBe None
     }
 
+    "support directories" in {
+      val db = FoundationDB(520)
+      implicit var subspace: Subspace =
+        Directory(db, Seq("my", "path", "to", "dir")).buildSubspace(("subspace", "at", "dir"))
+
+      val transaction = db.prepare(
+        for {
+          _           <- set("sence-of-life", 42)
+          senceOfLife <- get[String, Int]("sence-of-life")
+        } yield senceOfLife
+      )
+
+      transaction.unsafeRunSync() shouldBe Some(42)
+
+      subspace = Directory(db, Seq("my", "path", "to", "dir")).buildSubspace()
+
+      val anotherTransaction = db.prepare(
+        for {
+          senceOfLife <- get[String, Int]("sence-of-life")
+        } yield senceOfLife
+      )
+
+      anotherTransaction.unsafeRunSync() shouldBe None
+    }
+
     "support case class generic derivation" in {
       val db = FoundationDB(520)
 

@@ -12,20 +12,20 @@ Work in progress:
 - [x] Namespaces control
 - [x] Optimization of async effects
 - [x] Public CI setup and release
+- [x] Directory management
 - [ ] Integration and Unit tests
-- [ ] Directory management
 - [ ] Full support of transaction DSL 
 
 ## Example
 Current example is a design concept, if you have ideas how to make it better, feel free to open an Issue or PR.
 ```scala
-
   import me.archdev.foundationdb._
   import me.archdev.foundationdb.syntax._
 
   val fdb = FoundationDB(520)
 
-  implicit val subspace: Subspace = Subspace("test_subspace")
+  implicit val subspace: Subspace =
+    Directory(fdb, Seq("my", "directory", "path")).buildSubspace("test_subspace")
   
   fdb.execute(
       for {
@@ -38,7 +38,7 @@ Current example is a design concept, if you have ideas how to make it better, fe
 ```
 
 There is no release yet, but you can use snapshot to try it:
-```
+```sbtshell
 libraryDependencies += "me.archdev" %% "foundation-db-scala" % "0.0.1-SNAPSHOT"
 
 resolvers ++= Seq(
