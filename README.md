@@ -20,13 +20,14 @@ Work in progress:
 Current example is a design concept, if you have ideas how to make it better, feel free to open an Issue or PR.
 ```scala
   import me.archdev.foundationdb._
-  import me.archdev.foundationdb.syntax._
+  import me.archdev.foundationdb.namespaces._
 
-  val fdb = FoundationDB(520)
+  val fdb = FoundationDB.connect(520)
 
   implicit val subspace: Subspace =
-    Directory(fdb, Seq("my", "directory", "path")).buildSubspace("test_subspace")
-  
+    fdb.openDirectorySync(Seq("my", "directory", "path")).buildSubspace("test_subspace")
+    
+  import fdb.syntax._
   fdb.execute(
       for {
         _ <- set("key", SomeStorageModel("1", 2, "3"))
@@ -38,7 +39,7 @@ Current example is a design concept, if you have ideas how to make it better, fe
 ```
 
 There is no release yet, but you can use snapshot to try it:
-```sbtshell
+```scala
 libraryDependencies += "me.archdev" %% "foundation-db-scala" % "0.0.1-SNAPSHOT"
 
 resolvers ++= Seq(

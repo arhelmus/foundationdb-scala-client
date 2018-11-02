@@ -1,6 +1,6 @@
 package me.archdev.foundationdb
 
-import me.archdev.foundationdb.syntax._
+import me.archdev.foundationdb.namespaces.Subspace
 import me.archdev.foundationdb.utils.ITTestSpec
 
 class FoundationDBITSpec extends ITTestSpec {
@@ -8,7 +8,8 @@ class FoundationDBITSpec extends ITTestSpec {
   "FoundationDB wrapper" should {
 
     "support base transaction API" in {
-      val db = FoundationDB(520)
+      val db = FoundationDB.connect(520)
+      import db.syntax._
 
       val transaction = db.prepare(
         for {
@@ -23,10 +24,13 @@ class FoundationDBITSpec extends ITTestSpec {
       )
 
       transaction.unsafeRunSync() shouldBe (Some(42), Some("Kushka"), None)
+      db.close()
     }
 
     "support namespaces" in {
-      val db                          = FoundationDB(520)
+      val db = FoundationDB.connect(520)
+      import db.syntax._
+
       implicit var subspace: Subspace = Subspace("my-pretty-subspace")
 
       val transaction = db.prepare(
@@ -47,12 +51,15 @@ class FoundationDBITSpec extends ITTestSpec {
       )
 
       anotherTransaction.unsafeRunSync() shouldBe None
+      db.close()
     }
 
     "support directories" in {
-      val db = FoundationDB(520)
+      val db = FoundationDB.connect(520)
+      import db.syntax._
+
       implicit var subspace: Subspace =
-        Directory(db, Seq("my", "path", "to", "dir")).buildSubspace(("subspace", "at", "dir"))
+        db.openDirectorySync(Seq("my", "path", "to", "dir")).buildSubspace(("subspace", "at", "dir"))
 
       val transaction = db.prepare(
         for {
@@ -63,7 +70,7 @@ class FoundationDBITSpec extends ITTestSpec {
 
       transaction.unsafeRunSync() shouldBe Some(42)
 
-      subspace = Directory(db, Seq("my", "path", "to", "dir")).buildSubspace()
+      subspace = db.openDirectorySync(Seq("my", "path", "to", "dir")).buildSubspace()
 
       val anotherTransaction = db.prepare(
         for {
@@ -72,10 +79,12 @@ class FoundationDBITSpec extends ITTestSpec {
       )
 
       anotherTransaction.unsafeRunSync() shouldBe None
+      db.close()
     }
 
     "support case class generic derivation" in {
-      val db = FoundationDB(520)
+      val db = FoundationDB.connect(520)
+      import db.syntax._
 
       case class DataStorageClass(a: String, b: Int)
 
@@ -87,6 +96,7 @@ class FoundationDBITSpec extends ITTestSpec {
       )
 
       transaction.unsafeRunSync() shouldBe Some(DataStorageClass("test", 42))
+      db.close()
     }
 
   }

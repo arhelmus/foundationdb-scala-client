@@ -12,6 +12,7 @@ libraryDependencies ++= Seq(
   "org.foundationdb" % "fdb-java" % "5.2.5",
   "org.typelevel" %% "cats-core" % "1.4.0",
   "org.typelevel" %% "cats-effect" % "1.0.0",
+  "org.typelevel" %% "cats-free" % "1.0.0",
   "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0",
   "com.chuusai" %% "shapeless" % "2.3.3"
 )

@@ -1,4 +1,4 @@
-package me.archdev.foundationdb
+package me.archdev.foundationdb.namespaces
 
 import com.apple.foundationdb.subspace.{ Subspace => JavaSubspace }
 import me.archdev.foundationdb.serializers._
