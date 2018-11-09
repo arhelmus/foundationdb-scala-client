@@ -1,7 +1,7 @@
 package me.archdev
 
-import java.util.concurrent.CompletableFuture
-import java.util.function
+import java.util.concurrent.{ AbstractExecutorService, CompletableFuture, TimeUnit }
+import java.util.{ function, Collections }
 
 import cats.Monad
 import cats.data.StateT
@@ -11,7 +11,7 @@ import com.apple.foundationdb.tuple.Tuple
 import me.archdev.foundationdb.clients.FoundationDBClient
 
 import scala.compat.java8.FutureConverters._
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, ExecutionContextExecutorService, Future }
 
 package object foundationdb {
 
@@ -45,6 +45,25 @@ package object foundationdb {
         case Right(value) => CompletableFuture.completedFuture(value)
         case Left(value)  => tailRecM(value)(f)
       }))
+  }
+
+  // https://groups.google.com/forum/#!topic/scala-user/ZyHrfzD7eX8
+  private[foundationdb] object ExecutionContextExecutorServiceBridge {
+    def apply(ec: ExecutionContext): ExecutionContextExecutorService = ec match {
+      case null                                  => throw null
+      case eces: ExecutionContextExecutorService => eces
+      case other =>
+        new AbstractExecutorService with ExecutionContextExecutorService {
+          override def prepare(): ExecutionContext                             = other
+          override def isShutdown                                              = false
+          override def isTerminated                                            = false
+          override def shutdown()                                              = ()
+          override def shutdownNow()                                           = Collections.emptyList[Runnable]
+          override def execute(runnable: Runnable): Unit                       = other.execute(runnable)
+          override def reportFailure(t: Throwable): Unit                       = other.reportFailure(t)
+          override def awaitTermination(length: Long, unit: TimeUnit): Boolean = false
+        }
+    }
   }
 
 }

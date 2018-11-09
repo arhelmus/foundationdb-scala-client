@@ -17,6 +17,12 @@ class TestClient extends FoundationDBClient[TestContext] {
   override def openDirectory(directoryPath: Seq[String], layer: Array[Byte]): IO[Directory] = ???
 
   override def prepare[A](transaction: TestContext[A])(implicit ec: ExecutionContext): IO[A] =
-    javaFutureToIO(transaction.run(Map.empty)).map(_._2)
+    javaFutureToIO(transaction.run(state)).map {
+      case (newState, result) =>
+        state = newState
+        result
+    }
+
+  private var state: TupleMap = Map.empty
 
 }

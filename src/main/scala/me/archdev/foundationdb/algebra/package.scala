@@ -2,7 +2,6 @@ package me.archdev.foundationdb
 
 import java.util.concurrent.CompletableFuture
 
-import cats.Monad
 import com.apple.foundationdb.Transaction
 import me.archdev.foundationdb.namespaces.Subspace
 import me.archdev.foundationdb.serializers.Tupler

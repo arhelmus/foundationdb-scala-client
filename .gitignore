@@ -16,3 +16,6 @@ project/plugins/project/
 # Scala-IDE specific
 .idea/
 rest.iml
+
+# test deps
+fdb.cluster
