@@ -1,6 +1,7 @@
 package me.archdev.foundationdb
 
 import com.apple.foundationdb.tuple.Tuple
+import me.archdev.foundationdb.algebra.DeserializationError
 import shapeless._
 
 package object serializers {
@@ -90,7 +91,13 @@ package object serializers {
   }
 
   implicit class FromTupleOps(tuple: Tuple) {
-    def fromTuple[T](implicit serializer: Tupler[T]): T = serializer.read(tuple, 0)
+    def fromTuple[T](implicit serializer: Tupler[T]): T =
+      try {
+        serializer.read(tuple, 0)
+      } catch {
+        case ex: ClassCastException =>
+          throw DeserializationError(ex.getMessage)
+      }
   }
 
 }

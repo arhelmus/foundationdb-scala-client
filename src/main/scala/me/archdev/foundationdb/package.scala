@@ -1,6 +1,6 @@
 package me.archdev
 
-import java.util.concurrent.{ AbstractExecutorService, CompletableFuture, TimeUnit }
+import java.util.concurrent.{ AbstractExecutorService, CompletableFuture, CompletionException, TimeUnit }
 import java.util.{ function, Collections }
 
 import cats.Monad
@@ -29,7 +29,10 @@ package object foundationdb {
     }
 
   private[foundationdb] def scalaFutureToIO[A](f: => Future[A]): IO[A] =
-    IO.fromFuture(IO(f))
+    IO.fromFuture(IO(f)).handleErrorWith {
+      case ex: CompletionException =>
+        throw ex.getCause
+    }
 
   private[foundationdb] def javaFutureToIO[A](f: => java.util.concurrent.CompletableFuture[A]): IO[A] =
     scalaFutureToIO(f.toScala)

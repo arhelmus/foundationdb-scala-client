@@ -15,4 +15,7 @@ package object algebra {
     def raw[V](f: Transaction => CompletableFuture[V]): F[V]
   }
 
+  sealed trait QueryErrors
+  case class DeserializationError(error: String) extends RuntimeException(s"Unable to deserialize Tuple, $error")
+
 }

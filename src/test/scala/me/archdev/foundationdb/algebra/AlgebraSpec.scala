@@ -3,6 +3,8 @@ package me.archdev.foundationdb.algebra
 import me.archdev.foundationdb._
 import me.archdev.foundationdb.utils.TestSpec
 
+import scala.util.Try
+
 abstract class AlgebraSpec extends TestSpec {
 
   def buildDatabaseClient(): FoundationDB
@@ -36,7 +38,18 @@ abstract class AlgebraSpec extends TestSpec {
         }
       }
 
-      "return deserialization error if object type is wrong" in new Context {}
+      "return deserialization error if object type is wrong" in new Context {
+        withDatabase { implicit database =>
+          import database.syntax._
+
+          Query(
+            for {
+              _ <- set("deserialization-test", "test")
+              v <- get[String, Int]("deserialization-test")
+            } yield v
+          ).expectFailure(DeserializationError("java.lang.String cannot be cast to java.lang.Number"))
+        }
+      }
 
       "return saved object from correct namespace" in new Context {
         withDatabase { implicit database =>
@@ -174,6 +187,9 @@ abstract class AlgebraSpec extends TestSpec {
     case class Query[A](q: GenericContext[A])(implicit database: FoundationDB) {
       def expectResult(a: A) =
         database.prepare(q).unsafeRunSync() shouldBe a
+
+      def expectFailure(t: Throwable) =
+        Try(expectResult(null.asInstanceOf[A])).toEither shouldBe Left(t)
 
       def execute() =
         database.prepare(q).unsafeRunSync()
