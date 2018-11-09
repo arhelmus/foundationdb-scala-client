@@ -22,7 +22,7 @@ Current example is a design concept, if you have ideas how to make it better, fe
   import me.archdev.foundationdb._
   import me.archdev.foundationdb.namespaces._
 
-  val fdb = FoundationDB.connect(520)
+  val fdb = FoundationDB.connect(520, "path/to/fdb.cluster")
 
   implicit val subspace: Subspace =
     fdb.openDirectorySync(Seq("my", "directory", "path")).buildSubspace("test_subspace")
