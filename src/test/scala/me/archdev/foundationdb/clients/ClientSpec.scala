@@ -18,7 +18,7 @@ abstract class ClientSpec extends TestSpec {
         import database.syntax._
 
         database.prepare(set("prepare-test", "test"))
-        database.execute(get("prepare-test")).await shouldBe None
+        database.execute(get[String, String]("prepare-test")).await shouldBe None
       }
 
     }
@@ -41,7 +41,7 @@ abstract class ClientSpec extends TestSpec {
 
         val flow: Future[Option[String]] = for {
           _ <- database.execute(set("flow-test", "test"))
-          v <- database.execute(get("flow-test"))
+          v <- database.execute(get[String, String]("flow-test"))
         } yield v
 
         flow.await shouldBe Some("test")
