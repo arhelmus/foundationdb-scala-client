@@ -13,8 +13,9 @@ Work in progress:
 - [x] Optimization of async effects
 - [x] Public CI setup and release
 - [x] Directory management
-- [ ] Integration and Unit tests
-- [ ] Full support of transaction DSL 
+- [x] Integration and Unit tests
+- [ ] Full support of transaction DSL
+- [ ] Docs 
 
 ## Example
 Current example is a design concept, if you have ideas how to make it better, feel free to open an Issue or PR.
