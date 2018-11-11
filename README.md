@@ -34,7 +34,7 @@ Current example is a design concept, if you have ideas how to make it better, fe
         _ <- set("key", SomeStorageModel("1", 2, "3"))
         _ <- set("key2", "value2")
         result <- get[String, SomeStorageModel]("key")
-        _ <- delete("key2")
+        _ <- clear("key2")
       } yield result
   )
 ```

@@ -9,13 +9,15 @@ import cats.effect.IO
 import com.apple.foundationdb.Transaction
 import com.apple.foundationdb.tuple.Tuple
 import me.archdev.foundationdb.clients.FoundationDBClient
+import me.archdev.foundationdb.serializers._
 
+import scala.collection.SortedMap
 import scala.compat.java8.FutureConverters._
 import scala.concurrent.{ ExecutionContext, ExecutionContextExecutorService, Future }
 
 package object foundationdb {
 
-  type TupleMap = Map[Tuple, Tuple]
+  type TupleMap = SortedMap[Tuple, Tuple]
 
   type GenericContext[A]  = StateT[CompletableFuture, Any, A]
   type DatabaseContext[A] = StateT[CompletableFuture, Transaction, A]

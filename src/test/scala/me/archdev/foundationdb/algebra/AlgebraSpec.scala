@@ -1,8 +1,10 @@
 package me.archdev.foundationdb.algebra
 
+import com.apple.foundationdb.FDBException
 import me.archdev.foundationdb._
 import me.archdev.foundationdb.utils.TestSpec
 
+import scala.reflect.ClassTag
 import scala.util.Try
 
 abstract class AlgebraSpec extends TestSpec {
@@ -73,6 +75,115 @@ abstract class AlgebraSpec extends TestSpec {
 
     }
 
+    "getKey" should {
+
+      "return value where key less than" in new Context {
+        withDatabase { implicit database =>
+          import database.syntax._
+
+          Query(for {
+            _ <- set(1, "1")
+            _ <- set(2, "2")
+            _ <- set(3, "3")
+            _ <- set(4, "4")
+            r <- getKey[Int](KeySelector.lastLessThan(3))
+          } yield r).expectResult(Some(2))
+        }
+      }
+
+      "return value where key less or eq" in new Context {
+        withDatabase { implicit database =>
+          import database.syntax._
+
+          Query(for {
+            _ <- set(1, "1")
+            _ <- set(2, "2")
+            _ <- set(3, "3")
+            _ <- set(4, "4")
+            r <- getKey[Int](KeySelector.lastLessOrEqual(3))
+          } yield r).expectResult(Some(3))
+        }
+      }
+
+      "return value where key greater than" in new Context {
+        withDatabase { implicit database =>
+          import database.syntax._
+
+          Query(for {
+            _ <- set(1, "1")
+            _ <- set(2, "2")
+            _ <- set(3, "3")
+            _ <- set(4, "4")
+            r <- getKey[Int](KeySelector.firstGreaterThan(3))
+          } yield r).expectResult(Some(4))
+        }
+      }
+
+      "return value where key greater or eq" in new Context {
+        withDatabase { implicit database =>
+          import database.syntax._
+
+          Query(for {
+            _ <- set(1, "1")
+            _ <- set(2, "2")
+            _ <- set(3, "3")
+            _ <- set(4, "4")
+            r <- getKey[Int](KeySelector.firstGreaterOrEqual(3))
+          } yield r).expectResult(Some(3))
+        }
+      }
+
+    }
+
+    "getRange" should {
+
+      "return values in some range" in new Context {
+        withDatabase { implicit database =>
+          import database.syntax._
+
+          Query(for {
+            _ <- set(1, "1")
+            _ <- set(2, "2")
+            _ <- set(3, "3")
+            _ <- set(4, "4")
+            _ <- set(5, "5")
+            r <- getRange[Int, String](2 -> 5)
+          } yield r).expectResult(Seq(KeyValue(2, "2"), KeyValue(3, "3"), KeyValue(4, "4")))
+        }
+      }
+
+      "return values in some range with limit" in new Context {
+        withDatabase { implicit database =>
+          import database.syntax._
+
+          Query(for {
+            _ <- set(1, "1")
+            _ <- set(2, "2")
+            _ <- set(3, "3")
+            _ <- set(4, "4")
+            _ <- set(5, "5")
+            r <- getRangeWithLimit[Int, String](2 -> 5, limit = 2)
+          } yield r).expectResult(Seq(KeyValue(2, "2"), KeyValue(3, "3")))
+        }
+      }
+
+      "return values in some range with limit and reversed" in new Context {
+        withDatabase { implicit database =>
+          import database.syntax._
+
+          Query(for {
+            _ <- set(1, "1")
+            _ <- set(2, "2")
+            _ <- set(3, "3")
+            _ <- set(4, "4")
+            _ <- set(5, "5")
+            r <- getRangeWithLimitReversed[Int, String](2 -> 5, limit = 2)
+          } yield r).expectResult(Seq(KeyValue(4, "4"), KeyValue(3, "3")))
+        }
+      }
+
+    }
+
     "set" should {
 
       "insert new value in database" in new Context {
@@ -123,7 +234,7 @@ abstract class AlgebraSpec extends TestSpec {
 
     }
 
-    "delete" should {
+    "clear" should {
 
       "remove existing value from database" in new Context {
         withDatabase { implicit database =>
@@ -132,7 +243,7 @@ abstract class AlgebraSpec extends TestSpec {
           Query(
             for {
               _ <- set("delete-test", "test")
-              _ <- delete("delete-test")
+              _ <- clear("delete-test")
               v <- get[String, String]("delete-test")
             } yield v
           ).expectResult(None)
@@ -145,7 +256,7 @@ abstract class AlgebraSpec extends TestSpec {
 
           Query(
             for {
-              _ <- delete("not-existed-value-test")
+              _ <- clear("not-existed-value-test")
               v <- get[String, String]("not-existed-value-test")
             } yield v
           ).expectResult(None)
@@ -161,12 +272,102 @@ abstract class AlgebraSpec extends TestSpec {
           withSubspace("second-subspace") { implicit subspace =>
             Query(
               for {
-                _ <- delete("delete-namespace")
+                _ <- clear("delete-namespace")
               } yield ()
             ).execute()
           }
 
           Query(get[String, String]("delete-namespace")).expectResult(Some("first-namespace"))
+        }
+      }
+
+      "remove value in range" in new Context {
+        withDatabase { implicit database =>
+          import database.syntax._
+
+          Query(
+            for {
+              _ <- set(1, "1")
+              _ <- set(2, "2")
+              _ <- set(3, "3")
+              _ <- set(4, "4")
+              _ <- set(5, "5")
+              _ <- clearRange(2 -> 4)
+              v <- getRange[Int, String](1 -> 6)
+            } yield v
+          ).expectResult(Seq(KeyValue(1, "1"), KeyValue(4, "4"), KeyValue(5, "5")))
+        }
+      }
+
+    }
+
+    "commit" should {
+
+      "commit changes and disallow execution of commands after" in new Context {
+        withDatabase { implicit database =>
+          import database.syntax._
+
+          Query(
+            for {
+              _ <- set(1, "1")
+              _ <- set(2, "2")
+              _ <- commit()
+              _ <- set(4, "4")
+              _ <- set(5, "5")
+              _ <- clearRange(2 -> 4)
+              v <- getRange[Int, String](1 -> 6)
+            } yield v
+          ).expectFDBFailure(2017)
+
+          Query(getRange[Int, String](1 -> 6)).expectResult(Seq(KeyValue(1, "1"), KeyValue(2, "2")))
+        }
+      }
+
+    }
+
+    "cancel" should {
+
+      "disallow execution of commands after and leave changes uncommited" in new Context {
+        withDatabase { implicit database =>
+          import database.syntax._
+
+          Query(
+            for {
+              _ <- set(1, "1")
+              _ <- set(2, "2")
+              _ <- database.syntax.cancel()
+              _ <- set(4, "4")
+              _ <- set(5, "5")
+              _ <- clearRange(2 -> 4)
+              v <- getRange[Int, String](1 -> 6)
+            } yield v
+          ).expectFDBFailure(1025)
+
+          Query(getRange[Int, String](1 -> 6)).expectResult(Nil)
+        }
+      }
+
+    }
+
+    "close" should {
+
+      "disallow execution of commands after and leave changes uncommited" in new Context {
+        withDatabase { implicit database =>
+          import database.syntax._
+
+          Query(
+            for {
+              _ <- set(1, "1")
+              _ <- set(2, "2")
+              _ <- close()
+              _ <- set(4, "4")
+              _ <- set(5, "5")
+              _ <- clearRange(2 -> 4)
+              v <- getRange[Int, String](1 -> 6)
+            } yield v
+          ).expectFailure[IllegalStateException]()
+
+          Query(getRange[Int, String](1 -> 6)).expectResult(Nil)
         }
       }
 
@@ -186,10 +387,16 @@ abstract class AlgebraSpec extends TestSpec {
 
     case class Query[A](q: GenericContext[A])(implicit database: FoundationDB) {
       def expectResult(a: A) =
-        database.prepare(q).unsafeRunSync() shouldBe a
+        execute() shouldBe a
 
       def expectFailure(t: Throwable) =
         Try(expectResult(null.asInstanceOf[A])).toEither shouldBe Left(t)
+
+      def expectFailure[A <: Throwable: ClassTag]() =
+        an[A] should be thrownBy execute()
+
+      def expectFDBFailure(code: Int) =
+        Try(expectResult(null.asInstanceOf[A])).toEither.left.get.asInstanceOf[FDBException].getCode shouldBe code
 
       def execute() =
         database.prepare(q).unsafeRunSync()

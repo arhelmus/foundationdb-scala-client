@@ -15,10 +15,12 @@ abstract class ClientSpec extends TestSpec {
     "prepare" should {
 
       "prepare query without execution" in new Context {
-        import database.syntax._
+        withDatabase { database =>
+          import database.syntax._
 
-        database.prepare(set("prepare-test", "test"))
-        database.execute(get[String, String]("prepare-test")).await shouldBe None
+          database.prepare(set("prepare-test", "test"))
+          database.execute(get[String, String]("prepare-test")).await shouldBe None
+        }
       }
 
     }
@@ -26,25 +28,29 @@ abstract class ClientSpec extends TestSpec {
     "execute" should {
 
       "apply query on database" in new Context {
-        import database.syntax._
+        withDatabase { database =>
+          import database.syntax._
 
-        database
-          .execute(for {
-            _ <- set("execute-test", "1")
-            v <- get[String, String]("execute-test")
-          } yield v)
-          .await shouldBe Some("1")
+          database
+            .execute(for {
+              _ <- set("execute-test", "1")
+              v <- get[String, String]("execute-test")
+            } yield v)
+            .await shouldBe Some("1")
+        }
       }
 
       "mutate state of database" in new Context {
-        import database.syntax._
+        withDatabase { database =>
+          import database.syntax._
 
-        val flow: Future[Option[String]] = for {
-          _ <- database.execute(set("flow-test", "test"))
-          v <- database.execute(get[String, String]("flow-test"))
-        } yield v
+          val flow: Future[Option[String]] = for {
+            _ <- database.execute(set("flow-test", "test"))
+            v <- database.execute(get[String, String]("flow-test"))
+          } yield v
 
-        flow.await shouldBe Some("test")
+          flow.await shouldBe Some("test")
+        }
       }
 
     }
@@ -52,14 +58,18 @@ abstract class ClientSpec extends TestSpec {
     "open directory" should {
 
       "prepare directory to be opened" in new Context {
-        database.openDirectory(Seq("path", "to", "dir"))
+        withDatabase { database =>
+          database.openDirectory(Seq("path", "to", "dir"))
+        }
       }
 
       "provide opened directory" in new Context {
-        database.openDirectorySync(Seq("path", "to", "dir")).buildSubspace().raw shouldNot be(null)
-        database.openDirectorySync(Seq("path", "to", "dir"), Array[Byte](1, 0, 1)).buildSubspace().raw shouldNot be(
-          null
-        )
+        withDatabase { database =>
+          database.openDirectorySync(Seq("path", "to", "dir")).buildSubspace().raw shouldNot be(null)
+          database.openDirectorySync(Seq("path", "to", "dir"), Array[Byte](1, 0, 1)).buildSubspace().raw shouldNot be(
+            null
+          )
+        }
       }
 
     }
@@ -67,7 +77,13 @@ abstract class ClientSpec extends TestSpec {
   }
 
   trait Context {
-    val database: FoundationDB = buildDatabaseClient()
+    def withDatabase[A](f: FoundationDB => A): A = {
+      val database: FoundationDB = buildDatabaseClient()
+      val result                 = f(database)
+      database.close()
+
+      result
+    }
   }
 
 }

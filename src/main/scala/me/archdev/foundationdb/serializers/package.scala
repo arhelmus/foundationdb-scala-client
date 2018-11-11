@@ -100,4 +100,7 @@ package object serializers {
       }
   }
 
+  def parseFDBObject[A: Tupler](bytes: Array[Byte]): A =
+    Tuple.fromBytes(bytes).fromTuple[A]
+
 }
