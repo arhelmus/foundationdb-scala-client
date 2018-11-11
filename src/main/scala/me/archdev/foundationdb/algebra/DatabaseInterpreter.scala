@@ -56,11 +56,14 @@ object DatabaseInterpreter extends QueryAlgebra[DatabaseContext] {
       limit: Int,
       reverse: Boolean,
       streamingMode: StreamingMode
-  )(implicit s: Subspace): DatabaseContext[Seq[KeyValue[K, V]]] =
-    transactionAction {
-      _.getRange(s.pack(range._1), s.pack(range._2), limit, reverse, streamingMode)
-        .asList()
-        .thenApply(javaClojure(parseFDBOutput[K, V]))
+  )(implicit s: Subspace): DatabaseContext[Iterator[KeyValue[K, V]]] =
+    transactionAction { tr =>
+      CompletableFuture.completedFuture(
+        tr.getRange(s.pack(range._1), s.pack(range._2), limit, reverse, streamingMode)
+          .iterator()
+          .asScala
+          .map(buildKeyValue[K, V])
+      )
     }
 
   override def clear[K: Tupler](key: K)(implicit subspace: Subspace): DatabaseContext[Unit] =
@@ -96,10 +99,13 @@ object DatabaseInterpreter extends QueryAlgebra[DatabaseContext] {
     transactionAction(f)
 
   private def parseFDBOutput[A](output: Array[Byte])(implicit vs: Tupler[A]): Option[A] =
-    Option(output).map(parseFDBObject[A](_)(vs))
+    Option(output).map(parseFDBObject[A])
 
   private def parseFDBOutput[K: Tupler, V: Tupler](output: java.util.List[JavaKeyValue]): Seq[KeyValue[K, V]] =
-    output.asScala.map(kv => KeyValue(parseFDBObject[K](kv.getKey), parseFDBObject[V](kv.getValue)))
+    output.asScala.map(buildKeyValue[K, V])
+
+  private def buildKeyValue[K: Tupler, V: Tupler](kv: JavaKeyValue): KeyValue[K, V] =
+    KeyValue(parseFDBObject[K](kv.getKey), parseFDBObject[V](kv.getValue))
 
   private def transactionAction[A](f: Transaction => CompletableFuture[A]): DatabaseContext[A] =
     StateT { tr =>

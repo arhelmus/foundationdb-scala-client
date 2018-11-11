@@ -64,14 +64,14 @@ object TestInterpreter extends QueryAlgebra[TestContext] {
       limit: Int,
       reverse: Boolean,
       streamingMode: StreamingMode
-  )(implicit s: Subspace): TestContext[Seq[KeyValue[K, V]]] =
+  )(implicit s: Subspace): TestContext[Iterator[KeyValue[K, V]]] =
     modifyState(
       identity,
       storage =>
         if (reverse) {
-          getRange[K, V](storage, range).reverse.take(limit)
+          getRange[K, V](storage, range).reverse.take(limit).toIterator
         } else {
-          getRange[K, V](storage, range).take(limit)
+          getRange[K, V](storage, range).take(limit).toIterator
       }
     )
 

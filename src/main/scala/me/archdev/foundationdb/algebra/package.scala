@@ -15,7 +15,7 @@ package object algebra {
     def get[K: Tupler, V: Tupler](key: K)(implicit s: Sub = Sub()): F[Option[V]]
     def getKey[K: Tupler](key: KeySelector): F[Option[K]]
 
-    // implement get range for iterators and key selectors
+    // implement get range for key selectors
     def getRange[K: Tupler, V: Tupler](range: (K, K))(implicit s: Sub = Sub()): F[Seq[KeyValue[K, V]]]
     def getRangeWithLimit[K: Tupler, V: Tupler](range: (K, K), limit: Int)(
         implicit s: Sub = Sub()
@@ -25,7 +25,7 @@ package object algebra {
     ): F[Seq[KeyValue[K, V]]]
     def getRangeStream[K: Tupler, V: Tupler](range: (K, K), limit: Int, reverse: Boolean, streamingMode: StreamingMode)(
         implicit s: Sub = Sub()
-    ): F[Seq[KeyValue[K, V]]]
+    ): F[Iterator[KeyValue[K, V]]]
 
     def clear[K: Tupler](key: K)(implicit s: Sub = Sub()): F[Unit]
     def clearRange[K: Tupler](range: (K, K))(implicit s: Sub = Sub()): F[Unit]
