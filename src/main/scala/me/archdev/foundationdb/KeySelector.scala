@@ -4,7 +4,9 @@ import com.apple.foundationdb.{ KeySelector => JavaKeySelector }
 import me.archdev.foundationdb.namespaces.{ Subspace => Sub }
 import me.archdev.foundationdb.serializers.Tupler
 
-case class KeySelector(raw: JavaKeySelector, ksType: KeySelectorType, subspace: Sub)
+case class KeySelector(raw: JavaKeySelector, ksType: KeySelectorType, subspace: Sub) {
+  def unpacked = subspace.raw.unpack(raw.getKey)
+}
 
 object KeySelector {
 

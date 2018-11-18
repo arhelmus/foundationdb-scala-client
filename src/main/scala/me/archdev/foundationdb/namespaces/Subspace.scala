@@ -8,6 +8,9 @@ case class Subspace(raw: JavaSubspace) {
   def pack[K: Tupler](key: K): Array[Byte] =
     raw.pack(key.toTuple)
 
+  lazy val isEmpty: Boolean =
+    raw.getKey.isEmpty
+
 }
 
 object Subspace {
