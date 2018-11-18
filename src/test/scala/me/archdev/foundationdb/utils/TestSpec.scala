@@ -3,9 +3,11 @@ package me.archdev.foundationdb.utils
 import java.io.{ File, PrintWriter }
 import java.util.function.Consumer
 
+import com.apple.foundationdb.FDBException
 import com.dimafeng.testcontainers.{ ForEachTestContainer, GenericContainer }
 import com.github.dockerjava.api.command.CreateContainerCmd
 import com.github.dockerjava.api.model.{ ExposedPort, PortBinding, Ports }
+import me.archdev.foundationdb.{ FoundationDB, GenericContext }
 import me.archdev.foundationdb.namespaces.Subspace
 import me.archdev.foundationdb.serializers.Tupler
 import org.scalatest.{ Matchers, WordSpec }
@@ -14,6 +16,8 @@ import org.testcontainers.containers.wait.strategy.Wait
 import scala.concurrent.duration._
 import scala.concurrent.{ Await, ExecutionContext, Future }
 import scala.io.Source
+import scala.reflect.ClassTag
+import scala.util.Try
 
 trait TestSpec extends WordSpec with Matchers {
 

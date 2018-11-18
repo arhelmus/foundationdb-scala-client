@@ -1,7 +1,7 @@
 package me.archdev.foundationdb
 
 import com.apple.foundationdb.{ Database, FDB }
-import me.archdev.foundationdb.clients.{ DatabaseClient, TestClient }
+import me.archdev.foundationdb.clients.{ DatabaseClient, InMemoryClient }
 
 import scala.concurrent.ExecutionContext
 
@@ -16,7 +16,7 @@ object FoundationDB {
   def connect(database: Database): FoundationDB =
     new DatabaseClient(database).asInstanceOf[FoundationDB]
 
-  def mocked(): FoundationDB =
-    new TestClient().asInstanceOf[FoundationDB]
+  def inMemory(): FoundationDB =
+    new InMemoryClient().asInstanceOf[FoundationDB]
 
 }

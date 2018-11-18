@@ -11,6 +11,9 @@ case class Subspace(raw: JavaSubspace) {
   lazy val isEmpty: Boolean =
     raw.getKey.isEmpty
 
+  override def hashCode: Int =
+    raw.hashCode()
+
 }
 
 object Subspace {

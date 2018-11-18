@@ -21,7 +21,7 @@ package object foundationdb {
 
   type GenericContext[A]  = StateT[CompletableFuture, Any, A]
   type DatabaseContext[A] = StateT[CompletableFuture, Transaction, A]
-  type TestContext[A]     = StateT[CompletableFuture, TupleMap, A]
+  type InMemoryContext[A] = StateT[CompletableFuture, TupleMap, A]
 
   type FoundationDB = FoundationDBClient[GenericContext]
 

@@ -1,4 +1,4 @@
-package me.archdev.foundationdb
+package me.archdev.foundationdb.utils
 
 import com.apple.foundationdb.{ KeySelector => JavaKeySelector }
 import me.archdev.foundationdb.namespaces.{ Subspace => Sub }

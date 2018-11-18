@@ -9,9 +9,9 @@ import me.archdev.foundationdb.namespaces.Directory
 import scala.collection.SortedMap
 import scala.concurrent.ExecutionContext
 
-class TestClient extends FoundationDBClient[TestContext] {
+class InMemoryClient extends FoundationDBClient[InMemoryContext] {
 
-  override val syntax: algebra.QueryAlgebra[TestContext] = algebra.TestInterpreter
+  override val syntax: algebra.QueryAlgebra[InMemoryContext] = interpreters.InMemoryInterpreter
 
   override def close(): Unit = ()
 
@@ -21,7 +21,7 @@ class TestClient extends FoundationDBClient[TestContext] {
   override def openDirectory(directoryPath: Seq[String], layer: Array[Byte]): IO[Directory] =
     IO(Directory.mocked(directoryPath, layer))
 
-  override def prepare[A](transaction: TestContext[A])(implicit ec: ExecutionContext): IO[A] =
+  override def prepare[A](transaction: InMemoryContext[A])(implicit ec: ExecutionContext): IO[A] =
     javaFutureToIO(transaction.run(state))
       .map {
         case (newState, result) =>

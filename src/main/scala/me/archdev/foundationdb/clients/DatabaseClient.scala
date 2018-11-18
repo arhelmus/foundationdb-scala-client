@@ -13,7 +13,7 @@ import scala.concurrent.ExecutionContext
 
 class DatabaseClient(val db: Database) extends FoundationDBClient[DatabaseContext] {
 
-  override val syntax: algebra.QueryAlgebra[DatabaseContext] = algebra.DatabaseInterpreter
+  override val syntax: algebra.QueryAlgebra[DatabaseContext] = interpreters.DatabaseInterpreter
 
   override def close(): Unit = db.close()
 

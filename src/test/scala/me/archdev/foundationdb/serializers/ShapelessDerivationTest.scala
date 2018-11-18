@@ -3,7 +3,7 @@ package me.archdev.foundationdb.serializers
 import com.apple.foundationdb.tuple.Tuple
 import me.archdev.foundationdb.utils.TestSpec
 
-class ShapelessDerivationSpec extends TestSpec {
+class ShapelessDerivationTest extends TestSpec {
 
   "Shapeless derivation" should {
 

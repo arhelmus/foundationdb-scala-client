@@ -1,7 +1,7 @@
 package me.archdev.foundationdb.clients
 import me.archdev.foundationdb.FoundationDB
 
-class TestClientSpec extends ClientSpec {
+class InMemoryClientTest extends ClientSpec {
   override def buildDatabaseClient(): FoundationDB =
-    FoundationDB.mocked()
+    FoundationDB.inMemory()
 }
