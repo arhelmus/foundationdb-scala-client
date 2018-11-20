@@ -4,10 +4,11 @@ import java.util.concurrent.CompletableFuture
 
 import cats.data.StateT
 import com.apple.foundationdb.tuple.Tuple
-import me.archdev.foundationdb.namespaces.Subspace
-import me.archdev.foundationdb.utils.{ KeyValue, SelectedKey }
-import me.archdev.foundationdb.serializers._
 import me.archdev.foundationdb._
+import me.archdev.foundationdb.namespaces.Subspace
+import me.archdev.foundationdb.serializers._
+import me.archdev.foundationdb.utils.{ SelectedKey, SubspaceKeyValue }
+import com.apple.foundationdb.{ KeyValue => JavaKeyValue }
 
 package object inmemory {
 
@@ -22,12 +23,13 @@ package object inmemory {
     override def compare(x: Tuple, y: Tuple): Int = x.compareTo(y)
   }
 
-  private[inmemory] def scanKeys[K: Tupler](storage: TupleMap,
-                                            range: (K, K))(implicit subspace: Subspace): Seq[SelectedKey[K]] =
+  private[inmemory] def scanKeys[K: Tupler](storage: TupleMap, range: (SelectedKey[K], SelectedKey[K]))(
+      implicit subspace: Subspace
+  ): Seq[SelectedKey[K]] =
     storage.keys
       .filter { key =>
-        val from = Tuple.fromBytes(subspace.pack(range._1))
-        val to   = Tuple.fromBytes(subspace.pack(range._2))
+        val from = Tuple.fromBytes(SelectedKey.pack(range._1))
+        val to   = Tuple.fromBytes(SelectedKey.pack(range._2))
 
         key.compareTo(from) >= 0 && key.compareTo(to) < 0
       }
@@ -35,9 +37,9 @@ package object inmemory {
       .map(SelectedKey.parseUnsafe[K])
       .toSeq
 
-  private[inmemory] def enrichKeys[K: Tupler, V: Tupler](storage: TupleMap, keys: Seq[K])(
+  private[inmemory] def enrichKeys[K: Tupler, V: Tupler](storage: TupleMap, keys: Seq[Tuple])(
       implicit subspace: Subspace
-  ): Seq[KeyValue[K, V]] =
-    keys.map(key => KeyValue(key, storage(key.toTuple).fromTuple[V]))
+  ): Seq[SubspaceKeyValue[K, V]] =
+    keys.map(key => SubspaceKeyValue.parse[K, V](new JavaKeyValue(key.pack, storage(key).pack())))
 
 }

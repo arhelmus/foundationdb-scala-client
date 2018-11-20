@@ -1,8 +1,9 @@
 package me.archdev.foundationdb.algebra
 
 import com.apple.foundationdb.StreamingMode
-import me.archdev.foundationdb.utils.{ KeySelector, KeyValue, SelectedKey }
+import me.archdev.foundationdb.utils.{ KeySelector, KeyValue, SelectedKey, SubspaceKeyValue }
 import me.archdev.foundationdb._
+import me.archdev.foundationdb.namespaces.Subspace
 
 abstract class SelectAlgebraSpec extends AlgebraSpec {
 
@@ -194,7 +195,7 @@ abstract class SelectAlgebraSpec extends AlgebraSpec {
           _ <- set(4, "4")
           _ <- set(5, "5")
           r <- selectRange[Int, String](KeySelector.firstGreaterThan(1) -> KeySelector.firstGreaterOrEqual(4))
-        } yield r).expectResult(Seq(KeyValue(2, "2"), KeyValue(3, "3")))
+        } yield r).expectResult(Seq(SubspaceKeyValue(2, "2", None), SubspaceKeyValue(3, "3", None)))
       }
     }
 
@@ -212,7 +213,7 @@ abstract class SelectAlgebraSpec extends AlgebraSpec {
             KeySelector.firstGreaterThan(1) -> KeySelector.firstGreaterOrEqual(4),
             2
           )
-        } yield r).expectResult(Seq(KeyValue(2, "2"), KeyValue(3, "3")))
+        } yield r).expectResult(Seq(SubspaceKeyValue(2, "2", None), SubspaceKeyValue(3, "3", None)))
       }
     }
 
@@ -230,7 +231,7 @@ abstract class SelectAlgebraSpec extends AlgebraSpec {
             KeySelector.firstGreaterThan(1) -> KeySelector.firstGreaterOrEqual(4),
             2
           )
-        } yield r).expectResult(Seq(KeyValue(3, "3"), KeyValue(2, "2")))
+        } yield r).expectResult(Seq(SubspaceKeyValue(3, "3", None), SubspaceKeyValue(2, "2", None)))
       }
     }
 
@@ -248,31 +249,32 @@ abstract class SelectAlgebraSpec extends AlgebraSpec {
                                               limit = 2,
                                               reverse = false,
                                               StreamingMode.ITERATOR)
-        } yield r.toSeq).expectResult(Seq(KeyValue(2, "2"), KeyValue(3, "3")))
+        } yield r.toSeq).expectResult(Seq(SubspaceKeyValue(2, "2", None), SubspaceKeyValue(3, "3", None)))
       }
     }
 
-//    "return range from specific subspace and subspaces around" in new Context {
-//      withDatabase { implicit database =>
-//        import database.syntax._
-//
-//        Query(set(3, "3")).execute()
-//
-//        withSubspace(1) { implicit subspace =>
-//          Query(
-//            for {
-//              _ <- set(1, "1")
-//              _ <- set(2, "2")
-//              res <- selectRange[Int, String](
-//                KeySelector.firstGreaterOrEqual(1) -> KeySelector.firstGreaterThan(3)
-//              )
-//            } yield res
-//          ).expectResult(Seq(KeyValue(1, "1"), KeyValue(2, "2"), KeyValue(3, "3")))
-//        }
-//
-//        Query(get[Int, String](3)).expectResult(Some("3"))
-//      }
-//    }
+    "return range from specific subspace and subspaces around" in new Context {
+      withDatabase { implicit database =>
+        import database.syntax._
+
+        Query(set(3, "3")).execute()
+        Query(set(4, "4")).execute()
+
+        withSubspace(1) { implicit subspace =>
+          Query(
+            for {
+              _ <- set(1, "1")
+              _ <- set(2, "2")
+              res <- selectRange[Int, String](
+                KeySelector.firstGreaterOrEqual(1) -> KeySelector.lastLessOrEqual(4, Subspace())
+              )
+            } yield res
+          ).expectResult(Seq(SubspaceKeyValue(1, "1"), SubspaceKeyValue(2, "2"), SubspaceKeyValue(3, "3", None)))
+        }
+
+        Query(get[Int, String](3)).expectResult(Some("3"))
+      }
+    }
 
   }
 

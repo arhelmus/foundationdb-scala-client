@@ -30,7 +30,7 @@ trait MutationInterpreter extends MutationAlgebra[InMemoryContext] {
     )
 
   private def clearRange[K: Tupler](storage: TupleMap, range: (K, K))(implicit subspace: Subspace): TupleMap = {
-    val keysToRemove = scanKeys(storage, range)
+    val keysToRemove = scanKeys(storage, SelectedKey.range[K](range))
       .map(SelectedKey.toSubspaceKey[K])
       .filter(_.isDefined)
       .map(_.get)

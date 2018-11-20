@@ -130,26 +130,26 @@ abstract class GetAlgebraSpec extends AlgebraSpec {
       }
     }
 
-//    "return range from specific subspace" in new Context {
-//      withDatabase { implicit database =>
-//        import database.syntax._
-//
-//        Query(set(3, "3")).execute()
-//
-//        withSubspace("get-range-subspace") { implicit subspace =>
-//          Query(
-//            for {
-//              _   <- set(1, "1")
-//              _   <- set(2, "2")
-//              _   <- set(3, "42")
-//              res <- getRange[Int, String](1 -> 4)
-//            } yield res
-//          ).expectResult(Seq(KeyValue(1, "1"), KeyValue(2, "2"), KeyValue(3, "42")))
-//        }
-//
-//        Query(get[Int, String](3)).expectResult(Some("3"))
-//      }
-//    }
+    "return range from specific subspace" in new Context {
+      withDatabase { implicit database =>
+        import database.syntax._
+
+        Query(set(3, "3")).execute()
+
+        withSubspace("get-range-subspace") { implicit subspace =>
+          Query(
+            for {
+              _   <- set(1, "1")
+              _   <- set(2, "2")
+              _   <- set(3, "42")
+              res <- getRange[Int, String](1 -> 4)
+            } yield res
+          ).expectResult(Seq(KeyValue(1, "1"), KeyValue(2, "2"), KeyValue(3, "42")))
+        }
+
+        Query(get[Int, String](3)).expectResult(Some("3"))
+      }
+    }
 
   }
 

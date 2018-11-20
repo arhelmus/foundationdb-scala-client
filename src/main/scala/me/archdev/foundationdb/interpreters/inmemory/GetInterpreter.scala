@@ -6,7 +6,7 @@ import me.archdev.foundationdb.{ serializers, InMemoryContext, TupleMap }
 import me.archdev.foundationdb.algebra.GetAlgebra
 import me.archdev.foundationdb.namespaces.Subspace
 import me.archdev.foundationdb.serializers._
-import me.archdev.foundationdb.utils.{ KeyValue, SelectedKey }
+import me.archdev.foundationdb.utils.{ KeyValue, SelectedKey, SubspaceKey }
 
 trait GetInterpreter extends GetAlgebra[InMemoryContext] {
 
@@ -61,11 +61,9 @@ trait GetInterpreter extends GetAlgebra[InMemoryContext] {
                                              range: (K, K))(implicit subspace: Subspace): Seq[KeyValue[K, V]] =
     enrichKeys[K, V](
       storage,
-      scanKeys(storage, range)
-        .map(SelectedKey.toSubspaceKey[K])
-        .filter(_.isDefined)
-        .map(_.get)
-    )
+      scanKeys(storage, SelectedKey.range[K](range))
+        .map(SelectedKey.toTuple[K])
+    ).map(_.keyValue)
 
 }
 

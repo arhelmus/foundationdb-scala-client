@@ -36,4 +36,15 @@ object SelectedKey {
         key.toTuple.pack()
     }
 
+  def toTuple[K: Tupler](selectedKey: SelectedKey[K]): Tuple =
+    selectedKey.maybeSubspace
+      .map(implicit s => SubspaceKey.toTuple[K](selectedKey.key))
+      .getOrElse(selectedKey.key.toTuple)
+
+  def range[K](range: (K, K))(implicit subspace: Subspace): (SelectedKey[K], SelectedKey[K]) =
+    (
+      SelectedKey(Some(subspace), range._1),
+      SelectedKey(Some(subspace), range._2)
+    )
+
 }

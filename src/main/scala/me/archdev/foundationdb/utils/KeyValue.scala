@@ -15,3 +15,25 @@ object KeyValue {
     )
 
 }
+
+case class SubspaceKeyValue[K, V](key: K, value: V, subspace: Option[Subspace]) {
+
+  lazy val keyValue = KeyValue(key, value)
+
+}
+
+object SubspaceKeyValue {
+
+  def apply[K, V](key: K, value: V)(implicit subspace: Subspace): SubspaceKeyValue[K, V] =
+    SubspaceKeyValue(key, value, Some(subspace))
+
+  def parse[K: Tupler, V: Tupler](kv: JavaKeyValue)(implicit subspace: Subspace): SubspaceKeyValue[K, V] = {
+    val selectedKey = SelectedKey.parseUnsafe[K](kv.getKey)
+    SubspaceKeyValue(
+      key = selectedKey.key,
+      value = FDBObject.parseUnsafe[V](kv.getValue),
+      subspace = selectedKey.maybeSubspace
+    )
+  }
+
+}

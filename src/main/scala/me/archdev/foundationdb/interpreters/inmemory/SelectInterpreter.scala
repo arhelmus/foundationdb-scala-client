@@ -26,7 +26,7 @@ trait SelectInterpreter extends SelectAlgebra[InMemoryContext] {
 
   override def selectRange[K: Tupler, V: Tupler](
       range: (KeySelector, KeySelector)
-  )(implicit s: Subspace): InMemoryContext[Seq[KeyValue[K, V]]] =
+  )(implicit s: Subspace): InMemoryContext[Seq[SubspaceKeyValue[K, V]]] =
     modifyState(
       identity,
       selectRange[K, V](_, range)
@@ -34,7 +34,7 @@ trait SelectInterpreter extends SelectAlgebra[InMemoryContext] {
 
   override def selectRangeWithLimit[K: Tupler, V: Tupler](range: (KeySelector, KeySelector), limit: Int)(
       implicit s: Subspace
-  ): InMemoryContext[Seq[KeyValue[K, V]]] =
+  ): InMemoryContext[Seq[SubspaceKeyValue[K, V]]] =
     modifyState(
       identity,
       selectRange[K, V](_, range).take(limit)
@@ -42,7 +42,7 @@ trait SelectInterpreter extends SelectAlgebra[InMemoryContext] {
 
   override def selectRangeWithLimitReversed[K: Tupler, V: Tupler](range: (KeySelector, KeySelector), limit: Int)(
       implicit s: Subspace
-  ): InMemoryContext[Seq[KeyValue[K, V]]] =
+  ): InMemoryContext[Seq[SubspaceKeyValue[K, V]]] =
     modifyState(
       identity,
       selectRange[K, V](_, range).reverse.take(limit)
@@ -53,7 +53,7 @@ trait SelectInterpreter extends SelectAlgebra[InMemoryContext] {
       limit: Int,
       reverse: Boolean,
       streamingMode: StreamingMode
-  )(implicit s: Subspace): InMemoryContext[Iterator[KeyValue[K, V]]] =
+  )(implicit s: Subspace): InMemoryContext[Iterator[SubspaceKeyValue[K, V]]] =
     modifyState(
       identity,
       storage =>
@@ -91,13 +91,13 @@ trait SelectInterpreter extends SelectAlgebra[InMemoryContext] {
 
   private def selectRange[K: Tupler, V: Tupler](storage: TupleMap, range: (KeySelector, KeySelector))(
       implicit subspace: Subspace
-  ): Seq[KeyValue[K, V]] = {
+  ): Seq[SubspaceKeyValue[K, V]] = {
 
     val result = for {
       from <- selectMatchingKey[K](storage, range._1)
       to   <- selectMatchingKey[K](storage, range._2)
-      keys = scanKeys[K](storage, (from.key, to.key))
-    } yield enrichKeys[K, V](storage, keys.map(SelectedKey.pack[K]).map(FDBObject.parseUnsafe[K]))
+      keys = scanKeys[K](storage, (from, to))
+    } yield enrichKeys[K, V](storage, keys.map(SelectedKey.toTuple[K]))
 
     result.getOrElse(Nil)
   }
