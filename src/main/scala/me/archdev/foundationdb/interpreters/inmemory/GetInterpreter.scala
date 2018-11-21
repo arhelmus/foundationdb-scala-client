@@ -17,6 +17,8 @@ trait GetInterpreter extends GetAlgebra[InMemoryContext] {
       storage.get(Tuple.fromBytes(s.pack(key))).map(_.fromTuple[V])
     })
 
+  override def watch[K: Tupler](key: K)(implicit s: Subspace): InMemoryContext[Unit] = ???
+
   override def getRange[K: Tupler, V: Tupler](
       range: (K, K)
   )(implicit s: Subspace): InMemoryContext[Seq[KeyValue[K, V]]] =

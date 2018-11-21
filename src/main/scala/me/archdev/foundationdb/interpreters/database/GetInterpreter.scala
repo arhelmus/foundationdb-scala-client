@@ -18,6 +18,11 @@ trait GetInterpreter extends GetAlgebra[DatabaseContext] {
       _.get(subspace.pack(key)).thenApply(javaClojure(FDBObject.parse[V]))
     }
 
+  override def watch[K: Tupler](key: K)(implicit subspace: Subspace = Subspace()): DatabaseContext[Unit] =
+    transactionAction {
+      _.watch(subspace.pack(key)).thenApply(javaClojure(_ => ()))
+    }
+
   override def getRange[K: Tupler, V: Tupler](
       range: (K, K)
   )(implicit s: Subspace): DatabaseContext[Seq[KeyValue[K, V]]] =

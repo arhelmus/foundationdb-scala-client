@@ -36,6 +36,9 @@ trait AlgebraSpec extends TestSpec {
 
       def execute() =
         database.prepare(q).unsafeRunSync()
+
+      def executeAsync() =
+        database.prepare(q).unsafeToFuture()
     }
   }
 

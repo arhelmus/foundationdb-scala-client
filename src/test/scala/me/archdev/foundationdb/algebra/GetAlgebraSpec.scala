@@ -1,8 +1,8 @@
 package me.archdev.foundationdb.algebra
 
 import com.apple.foundationdb.StreamingMode
-import me.archdev.foundationdb.utils.KeyValue
 import me.archdev.foundationdb._
+import me.archdev.foundationdb.utils.KeyValue
 
 abstract class GetAlgebraSpec extends AlgebraSpec {
 
@@ -67,6 +67,73 @@ abstract class GetAlgebraSpec extends AlgebraSpec {
     }
 
   }
+
+//  "watch" should {
+//
+//    "trigger when data by key is changed" in new Context {
+//      withDatabase { implicit database =>
+//        import database.syntax._
+//
+//        Query(for {
+//          _ <- set("watch-test", 1)
+//
+//        } yield ()).execute()
+//
+//        val updatedResult = Query(for {
+//          _        <- watch("watch-test")
+//          newValue <- get[String, Int]("watch-test")
+//        } yield newValue).executeAsync()
+//
+//        Query(for {
+//          _ <- set("watch-test", 2)
+//        } yield ()).execute()
+//
+//        updatedResult.await shouldBe Some(2)
+//      }
+//    }
+//
+//    "trigger when key is created" in new Context {
+//      withDatabase { implicit database =>
+//        import database.syntax._
+//
+//        val updatedResult = Query(for {
+//          _        <- watch("watch-trigger-test")
+//          newValue <- get[String, Int]("watch-trigger-test")
+//        } yield newValue).executeAsync()
+//
+//        Query(set("watch-trigger-test", 1)).execute()
+//
+//        updatedResult.await shouldBe Some(1)
+//      }
+//    }
+//
+//    "trigger when data is triggered in correct namespace" in new Context {
+//      withDatabase { implicit database =>
+//        import database.syntax._
+//
+//        Query(set("watch-subspace-test", 1)).execute()
+//
+//        val updatedResult = withSubspace("watch-subspace") { implicit subspace =>
+//          Query(for {
+//            _        <- set("watch-subspace-test", 1)
+//            _        <- watch("watch-subspace-test")
+//            newValue <- get[String, Int]("watch-subspace-test")
+//          } yield newValue).executeAsync()
+//        }
+//
+//        Query(set("watch-subspace-test", 2)).execute()
+//
+//        updatedResult.isCompleted shouldBe false
+//
+//        withSubspace("watch-subspace") { implicit subspace =>
+//          Query(set("watch-subspace-test", 3)).execute()
+//        }
+//
+//        updatedResult.await shouldBe Some(3)
+//      }
+//    }
+//
+//  }
 
   "getRange" should {
 

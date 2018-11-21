@@ -1,5 +1,6 @@
 package me.archdev.foundationdb.interpreters.inmemory
 
+import com.apple.foundationdb.MutationType
 import com.apple.foundationdb.tuple.Tuple
 import me.archdev.foundationdb.algebra.MutationAlgebra
 import me.archdev.foundationdb.namespaces.Subspace
@@ -16,6 +17,10 @@ trait MutationInterpreter extends MutationAlgebra[InMemoryContext] {
       _ + (Tuple.fromBytes(s.pack(key)) -> value.toTuple),
       unit
     )
+
+  override def mutate[K: Tupler, P: Tupler](mutationType: MutationType, key: K, param: P)(
+      implicit s: Subspace
+  ): InMemoryContext[Unit] = ???
 
   override def clear[K: serializers.Tupler](key: K)(implicit s: Subspace): InMemoryContext[Unit] =
     modifyState(

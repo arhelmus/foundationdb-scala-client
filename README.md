@@ -14,7 +14,8 @@ Work in progress:
 - [x] Public CI setup and release
 - [x] Directory management
 - [x] Integration and Unit tests
-- [ ] Full support of transaction DSL
+- [x] Full support of transaction DSL
+- [ ] Testkit for onError, mutate, watch, getVersiontimestamp, getReadVersion, setReadVersion, getCommittedVersion
 - [ ] Docs 
 
 ## Example
@@ -23,7 +24,7 @@ Current example is a design concept, if you have ideas how to make it better, fe
   import me.archdev.foundationdb._
   import me.archdev.foundationdb.namespaces._
 
-  val fdb = FoundationDB.connect(520, "path/to/fdb.cluster")
+  val fdb = FoundationDB.connect(600, "path/to/fdb.cluster")
 
   implicit val subspace: Subspace =
     fdb.openDirectorySync(Seq("my", "directory", "path")).buildSubspace("test_subspace")

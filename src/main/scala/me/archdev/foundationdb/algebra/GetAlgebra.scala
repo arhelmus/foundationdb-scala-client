@@ -11,6 +11,8 @@ trait GetAlgebra[F[_]] {
 
   def get[K: Tupler, V: Tupler](key: K)(implicit s: Subspace = Subspace()): F[Option[V]]
 
+  def watch[K: Tupler](key: K)(implicit s: Subspace = Subspace()): F[Unit]
+
   def getRange[K: Tupler, V: Tupler](range: (K, K))(implicit s: Subspace = Subspace()): F[Seq[KeyValue[K, V]]]
 
   def getRangeWithLimit[K: Tupler, V: Tupler](range: (K, K), limit: Int)(

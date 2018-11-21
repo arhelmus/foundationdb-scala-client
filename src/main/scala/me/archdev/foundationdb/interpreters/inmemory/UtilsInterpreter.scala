@@ -10,6 +10,12 @@ trait UtilsInterpreter extends UtilsAlgebra[InMemoryContext] {
 
   override def raw[V](f: Transaction => CompletableFuture[V]): InMemoryContext[V] = ???
 
+  override def getReadVersion(): InMemoryContext[Long] = ???
+
+  override def setReadVersion(version: Long): InMemoryContext[Unit] = ???
+
+  override def getCommittedVersion(): InMemoryContext[Long] = ???
+
 }
 
 object UtilsInterpreter extends UtilsInterpreter
