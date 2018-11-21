@@ -5,5 +5,5 @@ import me.archdev.foundationdb.utils.ITTestSpec
 
 class DatabaseClientTest extends ClientSpec with ITTestSpec {
   override def buildDatabaseClient(): FoundationDB =
-    FoundationDB.connect(520, fdbClusterFilePath)
+    FoundationDB.connect(600, fdbClusterFilePath)
 }

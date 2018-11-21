@@ -9,7 +9,6 @@ scalaVersion := "2.12.7"
 crossScalaVersions := Seq("2.12.7", "2.11.12")
 
 libraryDependencies ++= Seq(
-  "org.foundationdb" % "fdb-java" % "5.2.5",
   "org.typelevel" %% "cats-core" % "1.4.0",
   "org.typelevel" %% "cats-effect" % "1.0.0",
   "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0",

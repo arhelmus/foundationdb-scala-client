@@ -11,5 +11,5 @@ class TransactionInterpreterDatabaseTest extends TransactionAlgebraSpec with Dat
 
 trait DatabaseInterpreterSpec extends AlgebraSpec with ITTestSpec {
   override def buildDatabaseClient(): FoundationDB =
-    FoundationDB.connect(520, fdbClusterFilePath)
+    FoundationDB.connect(600, fdbClusterFilePath)
 }
