@@ -39,7 +39,9 @@ class InMemoryClient extends FoundationDBClient[InMemoryContext] {
         case ex: Throwable => throw ex
       }
 
-  private var state: TupleMap = SortedMap.empty((x: Tuple, y: Tuple) => x.compareTo(y))
+  private var state: TupleMap = SortedMap.empty(new Ordering[Tuple] {
+    override def compare(x: Tuple, y: Tuple): Int = x.compareTo(y)
+  })
 
 }
 
