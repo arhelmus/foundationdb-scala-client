@@ -1,7 +1,5 @@
 name := "foundation-db-scala"
 
-version := "0.2.0-SNAPSHOT"
-
 organization := "me.archdev"
 
 scalaVersion := "2.12.7"
@@ -29,3 +27,17 @@ resolvers ++= Seq(
 )
 
 parallelExecution in ThisBuild := false
+
+inThisBuild(List(
+  organization := "me.archdev",
+  homepage := Some(url("https://github.com/archdev/foundationdb-scala-client")),
+  licenses := List("MIT" -> url("https://opensource.org/licenses/MIT")),
+  developers := List(
+    Developer(
+      "arhelmus",
+      "Arthur Kushka",
+      "arhelmus@gmail.com",
+      url("https://archdev.me")
+    )
+  )
+))

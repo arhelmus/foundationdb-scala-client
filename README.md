@@ -78,7 +78,7 @@ FoundationDB.inMemory()
 We are based on 6.0.15 FoundationDB Java driver version.
 
 ```scala
-libraryDependencies += "me.archdev" %% "foundation-db-scala" % "0.1.0-SNAPSHOT"
+libraryDependencies += "me.archdev" %% "foundation-db-scala" % "0.1.4"
 
 resolvers ++= Seq(
   Resolver.sonatypeRepo("releases"),
