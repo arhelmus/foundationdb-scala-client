@@ -6,6 +6,8 @@ scalaVersion := "2.12.7"
 
 crossScalaVersions := Seq("2.12.7", "2.11.12")
 
+libraryDependencies += "com.apple" % "foundationdb" % "6.0.15" from "https://www.foundationdb.org/downloads/6.0.15/bindings/java/fdb-java-6.0.15.jar"
+
 libraryDependencies ++= Seq(
   "org.typelevel" %% "cats-core" % "1.4.0",
   "org.typelevel" %% "cats-effect" % "1.0.0",
