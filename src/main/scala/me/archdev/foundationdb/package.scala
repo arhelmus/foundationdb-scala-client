@@ -39,7 +39,7 @@ package object foundationdb {
   private[foundationdb] def javaFutureToIO[A](f: => java.util.concurrent.CompletableFuture[A]): IO[A] =
     scalaFutureToIO(f.toScala)
 
-  private[foundationdb] implicit val completableFutureMonad: Monad[CompletableFuture] = new Monad[CompletableFuture] {
+  implicit val completableFutureMonad: Monad[CompletableFuture] = new Monad[CompletableFuture] {
     override def pure[A](x: A): CompletableFuture[A] = CompletableFuture.completedFuture(x)
 
     override def flatMap[A, B](fa: CompletableFuture[A])(f: A => CompletableFuture[B]): CompletableFuture[B] =
