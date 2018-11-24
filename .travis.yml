@@ -5,9 +5,7 @@ jdk:
   - oraclejdk8
 
 stages:
-  - name: compile
   - name: test
-  - name: coverage-publish
   - name: release
     if: (branch = master AND type = push) OR (tag IS present)
 
@@ -20,12 +18,8 @@ install:
 
 jobs:
   include:
-    - stage: compile
-      script: sbt compile
     - stage: test
-      script: sbt coverage test
-    - stage: coverage-publish
-      script: sbt coverageReport coverageAggregate codacyCoverage clean
+      script: sbt compile coverage test coverageReport coverageAggregate codacyCoverage clean
     - stage: release
       script: sbt +ci-release
 
